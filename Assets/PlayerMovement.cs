@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float movementSpeed = 10f;
-    public float gravity = 10f;
+    public float movementSpeed = 3f;
+    public float gravity = 30f;
+
+    public float maxJumpHeight = 15f;
+    private bool isJumping = false;
 
     private Vector3 movement;
     private CharacterController controller;
@@ -18,9 +21,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        //movement = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized * movementSpeed;
-        //transform.position = Vector3.Lerp(transform.position, transform.position + movement, Time.deltaTime);
-        //Vector3.MoveTowards(transform.position, transform.position + movement, movementSpeed * Time.deltaTime);
 
         if (controller.isGrounded)
         {
@@ -29,7 +29,20 @@ public class PlayerMovement : MonoBehaviour
             movement *= movementSpeed;
         }
 
+        // Apply gravity
         movement.y -= gravity * Time.deltaTime;
+
+        // Respond to jump button
+        if (!isJumping && controller.isGrounded && Input.GetButtonDown("Jump"))
+        {
+            //movement.y = maxJumpHeight * gravity;
+            movement.y = maxJumpHeight;
+            isJumping = true;
+        }
+
+        // Remove isJumping flag once we start falling
+        if (movement.y < 0) isJumping = false;
+
         controller.Move(movement * Time.deltaTime);
     }
 
